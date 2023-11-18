@@ -3,8 +3,18 @@
     tools:ignore="HardcodedText"
     tools:context=".MainActivity">
     <item
+        android:id="@+id/forwards"
+        android:title="Forwards"
+        android:icon="@drawable/baseline_arrow_forward_24"
+        android:showAsAction="ifRoom" />
+    <item
         android:id="@+id/refresh"
         android:title="Refresh"
         android:icon="@drawable/baseline_refresh_24"
-        android:showAsAction="always" />
+        android:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/manage_preferences"
+        android:title="Settings"
+        android:icon="@drawable/baseline_settings_24"
+        android:showAsAction="never" />
 </menu>

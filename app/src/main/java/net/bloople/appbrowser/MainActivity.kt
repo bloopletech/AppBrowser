@@ -2,6 +2,7 @@ package net.bloople.appbrowser
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
@@ -22,14 +23,14 @@ class MainActivity : Activity(), Browser {
         webView = findViewById(R.id.webview)
 
         toolbar = findViewById(R.id.toolbar)
-        toolbar.navigationIcon = resources.getDrawable(R.drawable.baseline_arrow_back_24, null)
-        toolbar.setNavigationOnClickListener {
-            if(webView.canGoBack()) webView.goBack()
-        }
-
         setActionBar(toolbar)
 
-        val browserContext = BrowserContext(Uri.parse("https://192.168.1.100:9292/"))
+        load()
+    }
+
+    private fun load() {
+        val baseUrl = AppBrowserApplication.preferences.getString("baseUrl", null) ?: "about:blank"
+        val browserContext = BrowserContext(Uri.parse(baseUrl))
         configureWebView(webView, browserContext)
     }
 
@@ -51,11 +52,24 @@ class MainActivity : Activity(), Browser {
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         when(menuItem.itemId) {
+            android.R.id.home -> webView.goBack()
+            R.id.forwards -> webView.goForward()
             R.id.refresh -> webView.reload()
+            R.id.manage_preferences -> {
+                val intent = Intent(this@MainActivity, AppBrowserPreferencesActivity::class.java)
+                startActivityForResult(intent, REQUEST_CODE_PREFERENCES)
+            }
+
             else -> {}
         }
 
         return true
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == REQUEST_CODE_PREFERENCES && resultCode == RESULT_OK) {
+            load()
+        }
     }
 
     override fun onTitleChanged(title: String) {
@@ -78,5 +92,9 @@ class MainActivity : Activity(), Browser {
         webView.webViewClient = AppWebViewClient(this, browserContext)
         webView.webChromeClient = AppWebChromeClient(this, browserContext)
         webView.loadUrl(browserContext.baseUrl.toString())
+    }
+
+    companion object {
+        private const val REQUEST_CODE_PREFERENCES = 0
     }
 }

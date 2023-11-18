@@ -29,11 +29,19 @@ class AppWebViewClient(private val activity: Activity, private val browserContex
         builder.show()
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onReceivedHttpAuthRequest(view: WebView, handler: HttpAuthHandler, host: String, realm: String) {
+        val username = AppBrowserApplication.preferences.getString("username", null)
+        val password = AppBrowserApplication.preferences.getString("password", null)
+
+        if(username != null && password != null) handler.proceed(username, password)
+        else promptForBasicAuthentication(handler, host, realm)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun promptForBasicAuthentication(handler: HttpAuthHandler, host: String, realm: String) {
         val builder = AlertDialog.Builder(activity)
 
-        val dialogView = activity.layoutInflater.inflate(R.layout.basic_authentication_dialog, null)
+        val dialogView = activity.layoutInflater.inflate(R.layout.dialog_basic_authentication, null)
         dialogView.findViewById<TextView>(R.id.host).text = "Host: $host"
         if(realm.isNotEmpty()) dialogView.findViewById<TextView>(R.id.realm).text = "Realm: $realm"
 
