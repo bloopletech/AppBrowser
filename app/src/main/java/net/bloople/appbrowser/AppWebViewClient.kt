@@ -8,10 +8,13 @@ import android.webkit.HttpAuthHandler
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.WebViewDatabase
 import android.widget.EditText
 import android.widget.TextView
 
 class AppWebViewClient(private val activity: Activity, private val browserContext: BrowserContext) : WebViewClient() {
+    private val webViewDatabase = WebViewDatabase.getInstance(activity)
+
     override fun onFormResubmission(view: WebView, dontResend: Message, resend: Message) {
         val builder = AlertDialog.Builder(activity)
 
@@ -30,10 +33,9 @@ class AppWebViewClient(private val activity: Activity, private val browserContex
     }
 
     override fun onReceivedHttpAuthRequest(view: WebView, handler: HttpAuthHandler, host: String, realm: String) {
-        val username = AppBrowserApplication.preferences.getString("username", null)
-        val password = AppBrowserApplication.preferences.getString("password", null)
+        val credentials = webViewDatabase.getHttpAuthUsernamePassword(host, realm)
 
-        if(username != null && password != null) handler.proceed(username, password)
+        if(credentials != null) handler.proceed(credentials[0], credentials[1])
         else promptForBasicAuthentication(handler, host, realm)
     }
 
@@ -51,6 +53,7 @@ class AppWebViewClient(private val activity: Activity, private val browserContex
             .setPositiveButton("Sign In") { _, id ->
                 val username = dialogView.findViewById<EditText>(R.id.username).text.toString()
                 val password = dialogView.findViewById<EditText>(R.id.password).text.toString()
+                webViewDatabase.setHttpAuthUsernamePassword(host, realm, username, password)
 
                 handler.proceed(username, password)
             }
