@@ -88,9 +88,11 @@ class MainActivity : Activity(), Browser {
         webSettings.setSupportZoom(false)
         webSettings.builtInZoomControls = false
         webSettings.useWideViewPort = true
+        webSettings.loadWithOverviewMode = true
 
         webView.webViewClient = AppWebViewClient(this, browserContext)
         webView.webChromeClient = AppWebChromeClient(this, browserContext)
+        webView.setInitialScale(1)
         webView.loadUrl(browserContext.baseUrl.toString())
     }
 
