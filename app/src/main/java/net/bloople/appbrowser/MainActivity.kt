@@ -1,15 +1,20 @@
 package net.bloople.appbrowser
 
+import android.R.attr.bitmap
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.webkit.WebView
 import android.widget.Toolbar
+import kotlin.math.roundToInt
 
 
 class MainActivity : Activity(), Browser {
@@ -72,6 +77,21 @@ class MainActivity : Activity(), Browser {
         }
     }
 
+    override fun onReceivedIcon(icon: Bitmap?) {
+        toolbar.logo = if(icon != null) {
+            val targetSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32.0f, resources.displayMetrics)
+            val scale = (targetSize / icon.width).coerceAtMost(targetSize / icon.height)
+            BitmapDrawable(
+                resources,
+                Bitmap.createScaledBitmap(
+                    icon,
+                    (icon.width * scale).roundToInt(),
+                    (icon.height * scale).roundToInt(), true)
+            )
+        }
+        else null
+    }
+
     override fun onTitleChanged(title: String) {
         toolbar.title = title
     }
@@ -90,8 +110,8 @@ class MainActivity : Activity(), Browser {
         webSettings.useWideViewPort = true
         webSettings.loadWithOverviewMode = true
 
-        webView.webViewClient = AppWebViewClient(this, browserContext)
-        webView.webChromeClient = AppWebChromeClient(this, browserContext)
+        webView.webViewClient = AppWebViewClient(this, this, browserContext)
+        webView.webChromeClient = AppWebChromeClient(this, this, browserContext)
         webView.setInitialScale(1)
         webView.loadUrl(browserContext.baseUrl.toString())
     }

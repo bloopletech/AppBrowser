@@ -3,6 +3,7 @@ package net.bloople.appbrowser
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.graphics.Bitmap
 import android.os.Message
 import android.webkit.HttpAuthHandler
 import android.webkit.WebResourceRequest
@@ -12,7 +13,10 @@ import android.webkit.WebViewDatabase
 import android.widget.EditText
 import android.widget.TextView
 
-class AppWebViewClient(private val activity: Activity, private val browserContext: BrowserContext) : WebViewClient() {
+class AppWebViewClient(
+    private val activity: Activity,
+    private val browser: Browser,
+    private val browserContext: BrowserContext) : WebViewClient() {
     private val webViewDatabase = WebViewDatabase.getInstance(activity)
 
     override fun onFormResubmission(view: WebView, dontResend: Message, resend: Message) {
@@ -30,6 +34,10 @@ class AppWebViewClient(private val activity: Activity, private val browserContex
                 dontResend.sendToTarget()
             }
         builder.show()
+    }
+
+    override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+        browser.onReceivedIcon(null)
     }
 
     override fun onReceivedHttpAuthRequest(view: WebView, handler: HttpAuthHandler, host: String, realm: String) {
