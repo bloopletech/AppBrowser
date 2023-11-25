@@ -11,7 +11,7 @@ android {
         applicationId = "net.bloople.appbrowser"
         minSdk = 33
         targetSdk = 33
-        versionCode = 2
+        versionCode = 3
         versionName = "1.0"
     }
 
