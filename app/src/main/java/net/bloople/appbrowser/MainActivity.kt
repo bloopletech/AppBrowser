@@ -1,6 +1,5 @@
 package net.bloople.appbrowser
 
-import android.R.attr.bitmap
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -30,13 +29,25 @@ class MainActivity : Activity(), Browser {
         toolbar = findViewById(R.id.toolbar)
         setActionBar(toolbar)
 
-        load()
+        load(savedInstanceState?.getBundle("webViewState"))
     }
 
-    private fun load() {
+    private fun load(webViewState: Bundle? = null) {
         val baseUrl = AppBrowserApplication.preferences.getString("baseUrl", null) ?: "about:blank"
         val browserContext = BrowserContext(Uri.parse(baseUrl))
         configureWebView(webView, browserContext)
+        if(webViewState != null) webView.restoreState(webViewState)
+        else webView.loadUrl(browserContext.baseUrl.toString())
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBundle("webViewState", Bundle().also { webView.saveState(it) })
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        savedInstanceState.getBundle("webViewState")?.let { webView.restoreState(it) }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -115,7 +126,6 @@ class MainActivity : Activity(), Browser {
         webView.webViewClient = AppWebViewClient(this, this, browserContext)
         webView.webChromeClient = AppWebChromeClient(this, this, browserContext)
         webView.setInitialScale(1)
-        webView.loadUrl(browserContext.baseUrl.toString())
     }
 
     companion object {
