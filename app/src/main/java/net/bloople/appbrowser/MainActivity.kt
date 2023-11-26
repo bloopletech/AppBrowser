@@ -52,6 +52,7 @@ class MainActivity : Activity(), Browser {
         super.onCreateOptionsMenu(menu)
 
         menuInflater.inflate(R.menu.browser_menu, menu)
+        if(AppBrowserApplication.isDebuggable) menuInflater.inflate(R.menu.browser_debug_menu, menu)
         return true
     }
 
@@ -64,6 +65,7 @@ class MainActivity : Activity(), Browser {
                 val intent = Intent(this@MainActivity, AppBrowserPreferencesActivity::class.java)
                 startActivityForResult(intent, REQUEST_CODE_PREFERENCES)
             }
+            R.id.recreate_activity -> recreate()
 
             else -> {}
         }
