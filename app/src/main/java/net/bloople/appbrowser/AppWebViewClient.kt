@@ -41,9 +41,11 @@ class AppWebViewClient(
     }
 
     override fun onReceivedHttpAuthRequest(view: WebView, handler: HttpAuthHandler, host: String, realm: String) {
+        if(!handler.useHttpAuthUsernamePassword()) webViewDatabase.setHttpAuthUsernamePassword(host, realm, null, null)
+
         val credentials = webViewDatabase.getHttpAuthUsernamePassword(host, realm)
 
-        if(credentials != null) handler.proceed(credentials[0], credentials[1])
+        if(credentials != null && null !in credentials) handler.proceed(credentials[0], credentials[1])
         else promptForHttpAuth(handler, host, realm)
     }
 
