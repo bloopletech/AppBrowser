@@ -37,11 +37,11 @@ class AppBrowserPreferencesFragment : PreferenceFragment(), SharedPreferences.On
         }
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         updatePreference(findPreference(key), key)
     }
 
-    private fun updatePreference(preference: Preference?, key: String) {
+    private fun updatePreference(preference: Preference?, key: String?) {
         if(preference == null) return
         if(preference is ListPreference) {
             preference.summary = preference.entry
